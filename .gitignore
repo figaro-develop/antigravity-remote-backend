@@ -4,3 +4,9 @@ temp_*
 .env
 .DS_Store
 dist/
+.cloudflare_log.txt
+.cloudflare_url
+*.json.bak
+proj*.json
+temp*.json
+scripts/cloudflared.exe
