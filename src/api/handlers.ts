@@ -631,6 +631,12 @@ export function setupRoutes(app: Express, wss: WebSocketServer) {
     app.use('/download-apk', express.static(path.join(__dirname, '../../../android/app/build/outputs/apk/debug')));
 
     app.get('/', async (req: Request, res: Response) => {
+        const ip = req.ip || req.socket.remoteAddress || '';
+        const isLocal = ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1' || ip.endsWith('127.0.0.1');
+        if (isLocal) {
+            res.redirect('/admin');
+            return;
+        }
         try {
             const token = generatePairingToken();
             const html = getChatHtml(token);
@@ -665,22 +671,27 @@ export function setupRoutes(app: Express, wss: WebSocketServer) {
             const token = generatePairingToken();
             let cloudflareUrl = '';
             try {
-                const fs = require('fs');
-                const path = require('path');
                 const urlPath = path.join(process.cwd(), '.cloudflare_url');
                 if (fs.existsSync(urlPath)) {
                     cloudflareUrl = fs.readFileSync(urlPath, 'utf8').trim();
                 }
             } catch (e) {}
             
+            const activePort = parseInt(process.env.PORT || '8080', 10);
+            const localIp = getLocalIp();
+            const localUrl = `http://${localIp}:${activePort}`;
+
             const payload = JSON.stringify({
-                serverUrl: cloudflareUrl,
+                serverUrl: cloudflareUrl || localUrl,
+                localUrl: localUrl,
+                remoteUrl: cloudflareUrl || '',
                 pairing_token: token,
-                server_id: process.env.SERVER_ID || ''
+                server_id: process.env.SERVER_ID || '',
+                name: os.hostname()
             });
 
             const qrDataUrl = await QRCode.toDataURL(payload);
-            const html = getAdminHtml(qrDataUrl, token, cloudflareUrl, process.env.SERVER_ID || '');
+            const html = getAdminHtml(qrDataUrl, token, cloudflareUrl, process.env.SERVER_ID || '', activePort, localIp);
             res.setHeader('Content-Type', 'text/html');
             res.send(html);
         } catch (err: any) {

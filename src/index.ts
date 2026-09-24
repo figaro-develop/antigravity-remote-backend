@@ -237,7 +237,7 @@ function startServer(port: number) {
             console.log(`=================================================`);
             console.log(`🚀 Antigravity Remote Backend is RUNNING`);
             console.log(`=================================================`);
-            console.log(`\n📱 Open http://localhost:${port} to view the pairing QR code\n`);
+            console.log(`\n📱 Open http://localhost:${port}/admin to view the pairing QR code\n`);
             console.log(`   IP Address : ${ipToShow}`);
             console.log(`   Port       : ${port}`);
             console.log(`\n=================================================\n`);
