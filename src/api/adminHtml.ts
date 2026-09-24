@@ -1,4 +1,4 @@
-export function getAdminHtml(qrDataUrl: string, pairingToken: string, cloudflareUrl: string, serverId: string): string {
+export function getAdminHtml(qrDataUrl: string, pairingToken: string, cloudflareUrl: string, serverId: string, activePort: number = 8080, localIp: string = '127.0.0.1'): string {
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -610,6 +610,9 @@ export function getAdminHtml(qrDataUrl: string, pairingToken: string, cloudflare
                     <span class="status-dot"></span>
                     <span>Server Online</span>
                 </div>
+                <a href="https://antigravity-remote-aabae.web.app" target="_blank" class="btn btn-primary btn-sm" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); border: none; font-weight: 600;">
+                    ⭐ Купить Pro ↗
+                </a>
                 <a href="/chat" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration: none;">
                     Web Chat ↗
                 </a>
@@ -632,6 +635,10 @@ export function getAdminHtml(qrDataUrl: string, pairingToken: string, cloudflare
                         Open the <strong>Antigravity Remote</strong> app on your Android device, tap <strong>Scan QR</strong>, and scan this code to link as Administrator.
                     </p>
                     <div class="meta-pill">
+                        <span>Local Wi-Fi URL:</span>
+                        <code>http://${localIp}:${activePort}</code>
+                    </div>
+                    <div class="meta-pill">
                         <span>Active Cloudflare URL:</span>
                         <code id="cf-url-display">${cloudflareUrl || 'Direct / Localhost'}</code>
                     </div>
@@ -642,16 +649,49 @@ export function getAdminHtml(qrDataUrl: string, pairingToken: string, cloudflare
                 </div>
 
                 <!-- Pro Upgrade Banner -->
-                <div class="card" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(49, 46, 129, 0.3) 100%);">
-                    <div class="card-header">
-                        <h2>⭐ Pro License</h2>
+                <div class="card" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(79, 70, 229, 0.25) 100%); border: 1px solid rgba(129, 140, 248, 0.4); box-shadow: 0 4px 14px rgba(99, 102, 241, 0.15);">
+                    <div class="card-header" style="margin-bottom: 0.5rem;">
+                        <h2 style="display: flex; align-items: center; gap: 0.4rem; color: #a5b4fc;">⭐ Antigravity PRO</h2>
                     </div>
-                    <p style="font-size: 0.825rem; color: var(--text-secondary); line-height: 1.45;">
-                        Unlock unlimited servers and full remote management. One license covers up to 3 mobile devices.
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 0.75rem;">
+                        Неограниченное число серверов, полная синхронизация и удаленное управление. Лицензия навсегда.
                     </p>
-                    <a href="https://antigravity-remote-aabae.web.app" target="_blank" class="btn btn-primary btn-sm" style="text-decoration: none;">
-                        Get Pro License Key
+                    <a href="https://antigravity-remote-aabae.web.app" target="_blank" class="btn btn-primary btn-sm" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; width: 100%; font-weight: 600; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 0.6rem 1rem;">
+                        Купить PRO лицензию ($9.99) ↗
                     </a>
+                </div>
+
+                <!-- Troubleshooting Card -->
+                <div class="card" style="border-left: 4px solid var(--accent-amber);">
+                    <div class="card-header">
+                        <h2>⚠️ Phone Shows "Offline"?</h2>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+                        <div>
+                            <strong style="color: var(--text-primary); display: block; margin-bottom: 0.25rem;">1. Windows Firewall (Local Wi-Fi)</strong>
+                            Windows blocks incoming connections to port <code>${activePort}</code> by default. To safely allow your phone on the local network, run this in <strong>PowerShell as Administrator</strong>:
+                            <div style="margin-top: 0.4rem; display: flex; gap: 0.5rem; align-items: center;">
+                                <input type="text" id="fw-cmd-input" readonly value="New-NetFirewallRule -DisplayName &quot;Antigravity Remote (Port ${activePort})&quot; -Direction Inbound -LocalPort ${activePort} -Protocol TCP -Profile Private -RemoteAddress LocalSubnet -Action Allow" style="flex: 1; font-size: 0.75rem; font-family: monospace; background: var(--card-bg-subtle); color: #818cf8; padding: 0.4rem 0.6rem; border: 1px solid var(--card-border); border-radius: var(--border-radius-sm);" />
+                                <button class="btn btn-secondary btn-sm" id="btn-copy-fw" style="white-space: nowrap;">Copy</button>
+                            </div>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">
+                                Note: <code>-Profile Private -RemoteAddress LocalSubnet</code> restricts access strictly to private/trusted local Wi-Fi networks for maximum security.
+                            </span>
+                        </div>
+
+                        <div>
+                            <strong style="color: var(--text-primary); display: block; margin-bottom: 0.25rem;">2. Same Wi-Fi Network</strong>
+                            Ensure your phone and PC are connected to the same Wi-Fi network (not guest Wi-Fi or cellular data). Test this URL in your mobile browser:
+                            <div style="margin-top: 0.25rem;">
+                                <a href="http://${localIp}:${activePort}/api/health" target="_blank" style="color: #38bdf8; word-break: break-all; text-decoration: none;">http://${localIp}:${activePort}/api/health ↗</a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <strong style="color: var(--text-primary); display: block; margin-bottom: 0.25rem;">3. Cloudflare Tunnel</strong>
+                            ${cloudflareUrl ? `If connecting outside Wi-Fi, test your public tunnel in phone browser: <div style="margin-top: 0.25rem;"><a href="${cloudflareUrl}/api/health" target="_blank" style="color: #38bdf8; word-break: break-all; text-decoration: none;">${cloudflareUrl}/api/health ↗</a></div><span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">Certain mobile carriers or ISPs in some regions block <code>*.trycloudflare.com</code>. Using local Wi-Fi is recommended in that case.</span>` : `No Cloudflare tunnel detected. The mobile app will connect via your local Wi-Fi network.`}
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1236,6 +1276,15 @@ export function getAdminHtml(qrDataUrl: string, pairingToken: string, cloudflare
             } finally {
                 modalSaveBtn.disabled = false;
                 modalSaveBtn.innerText = 'Save Changes';
+            }
+        });
+
+        // Copy firewall command
+        document.getElementById('btn-copy-fw')?.addEventListener('click', () => {
+            const input = document.getElementById('fw-cmd-input');
+            if (input) {
+                navigator.clipboard.writeText(input.value);
+                showToast('Firewall command copied to clipboard!');
             }
         });
 

@@ -211,11 +211,17 @@ describe('Handlers API', () => {
         expect(res.body[0].command).toBe('/test');
     });
 
-    it('GET / returns HTML page with Web Chat', async () => {
+    it('GET / redirects localhost to /admin', async () => {
         const res = await request(app).get('/');
+        expect(res.status).toBe(302);
+        expect(res.header.location).toBe('/admin');
+    });
+
+    it('GET /chat returns HTML page with Web Chat', async () => {
+        const res = await request(app).get('/chat');
         expect(res.status).toBe(200);
         expect(res.headers['content-type']).toMatch(/html/);
-        expect(res.text).toContain('Antigravity Remote Chat');
+        expect(res.text).toContain('Antigravity Remote Web Chat');
     });
 
     it('GET /admin returns HTML page with QR code for localhost requests', async () => {

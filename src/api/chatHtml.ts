@@ -840,19 +840,16 @@ export function getChatHtml(pairingToken: string): string {
 
     <!-- Pairing Screen -->
     <div id="pairing-screen">
-        <div class="pairing-card">
-            <h2>Web Chat Pairing</h2>
-            <p>Enter the 6-digit pairing code displayed in the Antigravity Remote Admin Console on your computer.</p>
-            <div class="code-input-container">
-                <input type="text" maxlength="1" class="code-char" id="c1" autofocus>
-                <input type="text" maxlength="1" class="code-char" id="c2">
-                <input type="text" maxlength="1" class="code-char" id="c3">
-                <input type="text" maxlength="1" class="code-char" id="c4">
-                <input type="text" maxlength="1" class="code-char" id="c5">
-                <input type="text" maxlength="1" class="code-char" id="c6">
+        <div class="pairing-card" style="max-width: 440px; text-align: center;">
+            <h2>Antigravity Remote Web Chat</h2>
+            <p style="margin-top: 0.75rem; line-height: 1.5; color: var(--text-secondary);">
+                Web Chat requires a guest invite link or administrator authorization.
+            </p>
+            <div style="margin: 1.5rem 0; padding: 1rem; background: var(--card-hover); border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; text-align: left;">
+                <strong style="color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Server Administrator?</strong>
+                Open the <a href="/admin" style="color: var(--accent-color); text-decoration: underline;">Admin Console</a> on this machine to manage devices, view pairing QR codes, and generate guest invite links.
             </div>
-            <button class="btn-pair" id="btn-submit-pair">Connect</button>
-            <div class="pairing-error" id="pairing-error">Invalid pairing code. Please try again.</div>
+            <a href="/admin" class="btn-pair" style="display: block; text-decoration: none; text-align: center; line-height: 2.75rem; border-radius: 8px;">Open Admin Console</a>
         </div>
     </div>
 
@@ -1075,9 +1072,9 @@ export function getChatHtml(pairingToken: string): string {
             }, 3000);
         }
 
-        // Pair button handler
-        document.getElementById('btn-submit-pair').addEventListener('click', submitPairCode);
-        document.getElementById('c6').addEventListener('keypress', (e) => {
+        // Pair button handler (if present)
+        document.getElementById('btn-submit-pair')?.addEventListener('click', submitPairCode);
+        document.getElementById('c6')?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') submitPairCode();
         });
 
